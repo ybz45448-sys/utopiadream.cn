@@ -1,0 +1,72 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: utopia-postgres
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5432:5432"   # 只绑本机回环：本机/SSH 隧道能连，公网不可达
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      # 首次初始化空数据库时自动执行建表脚本
+      - ./day23/db/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - utopia-network
+
+  backend:
+    build:
+      context: ./day23
+    image: utopia-backend:day54
+    container_name: utopia-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      DB_URL: ${DB_URL}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS}
+      JWT_EXPIRATION: ${JWT_EXPIRATION}
+    ports:
+      - "8080:8080"
+    networks:
+      - utopia-network
+
+  frontend:
+    build:
+      context: ./day15
+      args:
+        # NEXT_PUBLIC_ 变量在构建时注入前端代码
+        # 浏览器访问宿主机 8080，不能写 backend:8080
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+    image: utopia-frontend:day54
+    container_name: utopia-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - utopia-network
+
+volumes:
+  postgres-data:
+
+networks:
+  utopia-network:
+    driver: bridge

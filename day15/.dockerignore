@@ -1,0 +1,45 @@
+# ============================================================
+# .dockerignore — 告诉 Docker：构建上下文里【不要】发送哪些文件
+# ============================================================
+# 作用：
+#   1. 大幅减小构建上下文（发送给 Docker 引擎的文件体积）
+#   2. 防止本机 node_modules 覆盖容器内 npm ci 新装的依赖
+#   3. 防止 .env / .env.local 等真实秘密文件被打包进镜像
+# 原理：这里列的规则和 .gitignore 一样是 glob 匹配（* ? **）
+# ============================================================
+
+# 依赖目录 —— 体积最大，绝不能进上下文
+node_modules
+
+# Next.js 构建产物（本机旧缓存，进了容器也没用）
+.next
+
+# 测试覆盖率产物
+coverage
+
+# 构建输出目录
+out
+
+# 真实环境变量文件（含本地密钥，绝不能进镜像）
+.env
+.env.local
+.env.development
+.env.production
+
+# 保留示例文件（它只含占位符，不含秘密）
+!.env.example
+
+# 日志
+*.log
+npm-debug.log*
+
+# 测试报告/截图产物
+test-results
+playwright-report
+
+# 版本控制和系统文件
+.git
+.gitignore
+.dockerignore
+.gitkeep
+.DS_Store
