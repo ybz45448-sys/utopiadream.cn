@@ -24,8 +24,8 @@
 |---|---|
 | 前端 | Next.js 16 · React 19 · Tailwind CSS v4 · shadcn/ui · date-fns |
 | 后端 | Spring Boot 4.1 · Java 17 · Spring Security · JWT (jjwt) · JdbcTemplate |
-| 存储 | PostgreSQL 16 · JUnit 5 / Mockito / MockMvc |
-| 测试 | Vitest · Testing Library · Playwright (E2E) |
+| 存储 | PostgreSQL 16 |
+| 测试 | JUnit 5 / Mockito / MockMvc · Vitest · Testing Library · Playwright (E2E) |
 | 部署 | Docker · Docker Compose · Nginx 反向代理 · HTTPS |
 
 > 前端目录 `day15/`，后端目录 `day23/`（学习项目按天归档的目录名）。
@@ -68,13 +68,10 @@ graph TB
 # 1. 准备环境变量
 cp .env.example .env
 
-# 2. 构建后端镜像（compose 里 backend 没有 build 段，需先构建）
-docker build -t utopia-backend:day53 day23
+# 2. 构建并启动全部服务（backend/frontend 都带 build 段，自动构建）
+docker compose up -d --build
 
-# 3. 启动全部服务（frontend 有 build 段，up -d 会自动构建）
-docker compose up -d
-
-# 4. 访问
+# 3. 访问
 #    前端 http://localhost:3000
 #    后端 http://localhost:8080/api/topics
 ```
@@ -144,7 +141,7 @@ npm run dev                # http://localhost:3000
 - **服务器**：阿里云轻量应用服务器，Ubuntu 22.04，2核 2G
 - **反向代理**：Nginx（`/` → 前端 3000，`/api/` → 后端 8080）
 - **HTTPS**：443 已配置（当前为自签证书，ICP 备案通过后替换为 Let's Encrypt 正式证书）
-- **容器化**：Docker + Docker Compose，镜像 tag `day53` 标识部署基线
+- **容器化**：Docker + Docker Compose，镜像 tag `day54` 标识部署基线
 
 ---
 
