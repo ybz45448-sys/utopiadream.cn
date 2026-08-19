@@ -34,6 +34,22 @@ async function request(url, options = {}) {
         headers: headers,
         body: options.body || null,
     });
+    // ⭐ token 过期/无效时后端返回 401，这里统一处理：
+    //   清掉本地登录缓存 + 刷新页面 → 自动变回游客态
+    if (response.status === 401) {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+
+    //   不能直接 toast()：location.href 是整页跳转，页面卸载后 toast 显示不出来
+    sessionStorage.setItem('login_expired', '登录已过期，请重新登录');
+
+    
+    // ⭐ 不要 reload 当前页！如果当前页挂载时就发鉴权请求（如 /profile），
+    //   刷新回来还是游客、还是 403、又刷新 → 死循环。
+    //   直接跳回首页 —— 首页只用公开接口，游客访问永远不会 403，循环自然断了。
+    window.location.href = '/';
+    return { success: false, message: '登录已过期，请重新登录' };
+}
     let text = await response.text();
     try {
         return JSON.parse(text);  // 如果是 JSON，转成对象

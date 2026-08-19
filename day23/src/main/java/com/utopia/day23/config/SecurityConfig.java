@@ -11,6 +11,7 @@ package com.utopia.day23.config;
 import com.utopia.day23.security.JwtAuthenticationFilter;
 import com.utopia.day23.service.UserService;
 import com.utopia.day23.util.JwtUtil;   // ⭐ 新增
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -67,8 +68,21 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
+                .exceptionHandling(handling -> handling
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            // ⭐ 未登录 / token 过期 → 返回 401（而不是 Spring 默认的 403）
+                            //   这样前端就能区分：401=身份失效，403=没权限
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType("application/json;charset=UTF-8");
+                            response.getWriter().write(
+                                    "{\"success\":false,\"message\":\"登录已过期，请重新登录\"}"
+                            );
+                        })
+                )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+
 
                         // 注册和登录允许匿名访问
                         .requestMatchers(
@@ -84,7 +98,6 @@ public class SecurityConfig {
                                 "/api/topics/*",
                                 "/api/topics/*/comments",
                                 "/api/users/*"
-
                         ).permitAll()
 
                         // 其他接口必须登录
