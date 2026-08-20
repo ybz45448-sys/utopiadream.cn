@@ -21,6 +21,16 @@ export default function Footer() {
                             </div>
                             <div className="pt-6 border-t border-gray-800">
                                 <p>© 2026 乌托邦开发者社区 · 公益项目</p>
+                                <p className="mt-2">
+                                    <a
+                                        href="https://beian.miit.gov.cn/"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="hover:text-white transition-colors"
+                                    >
+                                        京ICP备2026053796号-1
+                                    </a>
+                                </p>
                             </div>
                         </div>
                     </footer>

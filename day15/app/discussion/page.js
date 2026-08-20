@@ -345,7 +345,7 @@ function DiscussionsContent() {
         <div className="space-y-3">
           {topics.map((topic) => (
             <Link key={topic.id} href={`/discussion/${topic.id}`}>
-              <Card className="hover:shadow-md transition-all cursor-pointer">
+              <Card className="hover:shadow-md transition-all cursor-pointer mt-3">
                 <CardContent className="p-5">
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="font-semibold">{topic.title}</h3>

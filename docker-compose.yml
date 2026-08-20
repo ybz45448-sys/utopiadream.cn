@@ -28,7 +28,7 @@ services:
   backend:
     build:
       context: ./day23
-    image: utopia-backend:day54
+    image: utopia-backend:day55
     container_name: utopia-backend
     restart: unless-stopped
     depends_on:
@@ -54,7 +54,7 @@ services:
         # NEXT_PUBLIC_ 变量在构建时注入前端代码
         # 浏览器访问宿主机 8080，不能写 backend:8080
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
-    image: utopia-frontend:day54
+    image: utopia-frontend:day55
     container_name: utopia-frontend
     restart: unless-stopped
     ports:
